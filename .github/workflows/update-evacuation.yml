@@ -1,0 +1,93 @@
+name: Update evacuation overview
+
+on:
+  workflow_dispatch:
+
+  # EMPFOHLEN:
+  # GitHub Actions unterstützt inzwischen timezone-aware schedules.
+  # Damit vermeidest du Sommer-/Winterzeit-Probleme.
+  schedule:
+    - cron: "0 8 * * 1-5"
+      timezone: "Europe/Berlin"
+    - cron: "45 8 * * 1-5"
+      timezone: "Europe/Berlin"
+    - cron: "35 9 * * 1-5"
+      timezone: "Europe/Berlin"
+    - cron: "35 10 * * 1-5"
+      timezone: "Europe/Berlin"
+    - cron: "25 11 * * 1-5"
+      timezone: "Europe/Berlin"
+    - cron: "25 12 * * 1-5"
+      timezone: "Europe/Berlin"
+    - cron: "15 13 * * 1-5"
+      timezone: "Europe/Berlin"
+    - cron: "30 14 * * 1-5"
+      timezone: "Europe/Berlin"
+    - cron: "15 15 * * 1-5"
+      timezone: "Europe/Berlin"
+
+  # ALTERNATIVE NUR ALS KOMMENTAR:
+  # Wenn du timezone NICHT nutzen willst, musst du UTC-Crons pflegen.
+  # Deutschland ist:
+  # - Winterzeit: UTC+1
+  # - Sommerzeit: UTC+2
+  #
+  # Beispiel Winterzeit:
+  # 08:00 DE = 07:00 UTC   -> '0 7 * * 1-5'
+  # 08:45 DE = 07:45 UTC   -> '45 7 * * 1-5'
+  # ...
+  #
+  # Beispiel Sommerzeit:
+  # 08:00 DE = 06:00 UTC   -> '0 6 * * 1-5'
+  # 08:45 DE = 06:45 UTC   -> '45 6 * * 1-5'
+  # ...
+  #
+  # Da das fehleranfällig ist, ist timezone: "Europe/Berlin" die bessere Variante.
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: true
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Repository auschecken
+        uses: actions/checkout@v4
+
+      - name: Python einrichten
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Abhängigkeiten installieren
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: HTML erzeugen
+        env:
+          WEBUNTIS_SERVER: ${{ secrets.WEBUNTIS_SERVER }}
+          WEBUNTIS_SCHOOL: ${{ secrets.WEBUNTIS_SCHOOL }}
+          WEBUNTIS_USERNAME: ${{ secrets.WEBUNTIS_USERNAME }}
+          WEBUNTIS_PASSWORD: ${{ secrets.WEBUNTIS_PASSWORD }}
+        run: |
+          python generate_html.py
+
+      - name: Pages konfigurieren
+        uses: actions/configure-pages@v5
+
+      - name: Pages-Artefakt hochladen
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: ./docs
+
+      - name: Nach GitHub Pages deployen
+        id: deployment
+        uses: actions/deploy-pages@v4
