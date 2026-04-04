@@ -66,6 +66,15 @@ jobs:
         with:
           python-version: "3.12"
 
+      - name: Diagnose Dateistruktur
+  run: |
+    pwd
+    ls -la
+    echo "--- .github ---"
+    ls -la .github || true
+    echo "--- workflows ---"
+    ls -la .github/workflows || true
+
       - name: Abhängigkeiten installieren
         run: |
           python -m pip install --upgrade pip
