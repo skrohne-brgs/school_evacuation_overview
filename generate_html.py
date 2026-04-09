@@ -112,7 +112,16 @@ def determine_relevant_slot(current_time: dt.datetime) -> ActiveLessonSlot | Non
     return None
 
 
+def ensure_local_timezone(value: dt.datetime) -> dt.datetime:
+    if value.tzinfo is None:
+        return value.replace(tzinfo=LOCAL_TIMEZONE)
+    return value.astimezone(LOCAL_TIMEZONE)
+
+
 def overlaps(period_start: dt.datetime, period_end: dt.datetime, slot: ActiveLessonSlot) -> bool:
+    period_start = ensure_local_timezone(period_start)
+    period_end = ensure_local_timezone(period_end)
+
     return period_start < slot.end and period_end > slot.start
 
 
