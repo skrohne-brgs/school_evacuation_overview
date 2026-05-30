@@ -228,11 +228,16 @@ def fetch_rows_for_active_slot(slot: ActiveLessonSlot) -> List[EvacuationRow]:
 
         for school_class in classes:
             # Tagesstundenplan der Klasse laden
-            periods = session.timetable(
-                klasse=school_class,
-                start=slot.start.date(),
-                end=slot.start.date(),
-            )
+            try:
+                periods = session.timetable(
+                    klasse=school_class,
+                    start=slot.start.date(),
+                    end=slot.start.date(),
+                )
+            except webuntis.errors.RemoteError:
+                # Ferien oder gesperrte Datumsbereiche liefern DateNotAllowed;
+                # andere RemoteErrors (z.B. Serverfehler) werden übersprungen.
+                continue
 
             matching_periods = [
                 period
