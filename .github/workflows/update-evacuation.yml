@@ -2,25 +2,6 @@ name: Update evacuation overview
 
 on:
   workflow_dispatch:
-  schedule:
-    - cron: "0 8 * * 1-5"
-      timezone: "Europe/Berlin"
-    - cron: "45 8 * * 1-5"
-      timezone: "Europe/Berlin"
-    - cron: "35 9 * * 1-5"
-      timezone: "Europe/Berlin"
-    - cron: "35 10 * * 1-5"
-      timezone: "Europe/Berlin"
-    - cron: "25 11 * * 1-5"
-      timezone: "Europe/Berlin"
-    - cron: "25 12 * * 1-5"
-      timezone: "Europe/Berlin"
-    - cron: "15 13 * * 1-5"
-      timezone: "Europe/Berlin"
-    - cron: "30 14 * * 1-5"
-      timezone: "Europe/Berlin"
-    - cron: "15 15 * * 1-5"
-      timezone: "Europe/Berlin"
 
 permissions:
   contents: read
